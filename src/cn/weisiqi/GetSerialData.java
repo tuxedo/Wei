@@ -15,11 +15,12 @@ import javax.comm.SerialPortEventListener;
  */
 @SuppressWarnings("all")
 public class GetSerialData {
+	private String dataFormat = "Data Received: ";
 	OutputStream os;
 
 	public void writePort(String msg, OutputStream os) {
 		try {
-			os.write("Data Received: ".getBytes());
+			os.write(dataFormat.getBytes());
 			for (int i = 0; i < msg.length(); i++) {
 				os.write(msg.charAt(i));
 			}
@@ -41,7 +42,7 @@ public class GetSerialData {
 			os = Sport.getOutputStream();
 			Sport.notifyOnDataAvailable(true);
 			Sport.notifyOnBreakInterrupt(true);
-			Sport.enableReceiveTimeout(500);
+			Sport.enableReceiveTimeout(100);
 			Sport.addEventListener(new SerialPortEventListener() {
 				public void serialEvent(SerialPortEvent e) {
 					InputStream is = null;
@@ -70,7 +71,7 @@ public class GetSerialData {
 						}
 						try {
 							writePort(msgBuffer.toString(), os);
-							System.out.println("Data Received: "
+							System.out.println(dataFormat
 									+ msgBuffer.toString());
 						} catch (Exception b) {
 							b.printStackTrace();
