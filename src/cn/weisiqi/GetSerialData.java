@@ -13,7 +13,22 @@ import javax.comm.SerialPortEventListener;
  * @author 魏思琪
  * 
  */
+@SuppressWarnings("all")
 public class GetSerialData {
+	OutputStream os;
+
+	public void writePort(String msg, OutputStream os) {
+		try {
+			os.write("Data Received: ".getBytes());
+			for (int i = 0; i < msg.length(); i++) {
+				os.write(msg.charAt(i));
+			}
+			os.write('\n');
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
 	public void listPort() {
 		try {
 			CommPortIdentifier portId = CommPortIdentifier
@@ -21,10 +36,9 @@ public class GetSerialData {
 			SerialPort Sport = (SerialPort) portId.open("test", 2000);
 			System.out.println("串口 " + Sport.getName() + " 连接成功");
 			final SerialPort sp = Sport;
-			Sport.setSerialPortParams(2400, SerialPort.DATABITS_8,
-					SerialPort.STOPBITS_2, SerialPort.PARITY_NONE);
-			@SuppressWarnings("unused")
-			OutputStream os = Sport.getOutputStream();
+			Sport.setSerialPortParams(9600, SerialPort.DATABITS_8,
+					SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+			os = Sport.getOutputStream();
 			Sport.notifyOnDataAvailable(true);
 			Sport.notifyOnBreakInterrupt(true);
 			Sport.enableReceiveTimeout(500);
@@ -55,17 +69,13 @@ public class GetSerialData {
 							}
 						}
 						try {
-							System.out.println("Result is:"
-									+ Double.valueOf(msgBuffer.toString()));
+							writePort(msgBuffer.toString(), os);
+							System.out.println("Data Received: "
+									+ msgBuffer.toString());
 						} catch (Exception b) {
 							b.printStackTrace();
 						} finally {
-							try {
-								is.close();
-								sp.close();
-							} catch (Exception c) {
-								c.printStackTrace();
-							}
+
 						}
 						break;
 					case SerialPortEvent.BI:
